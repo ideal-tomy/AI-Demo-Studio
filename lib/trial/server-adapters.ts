@@ -1,0 +1,55 @@
+// CORE-CANDIDATE — server only
+// Reuse browser adapters with server-injected secrets (never sent to client).
+import { anthropicAdapter } from "@/lib/providers/anthropic-adapter";
+import { geminiAdapter } from "@/lib/providers/gemini-adapter";
+import { openaiAdapter } from "@/lib/providers/openai-adapter";
+import type { AiProvider } from "@/types/access-mode";
+import type { AiRequest, AiResult, NormalizedMessage } from "@/types/provider";
+
+export function getServerApiKey(provider: AiProvider): string {
+  const key =
+    provider === "openai"
+      ? process.env.OPENAI_API_KEY
+      : provider === "anthropic"
+        ? process.env.ANTHROPIC_API_KEY
+        : process.env.GOOGLE_API_KEY;
+  if (!key?.trim()) {
+    throw Object.assign(
+      new Error(`Server API key for ${provider} is not configured`),
+      { status: 503, body: "provider_secret_missing" },
+    );
+  }
+  return key.trim();
+}
+
+export async function runServerProviderRequest(input: {
+  provider: AiProvider;
+  model: string;
+  systemPrompt: string;
+  messages: NormalizedMessage[];
+  maxOutputTokens: number;
+}): Promise<AiResult> {
+  const apiKey = getServerApiKey(input.provider);
+  const request: AiRequest = {
+    accessMode: "managed-trial",
+    provider: input.provider,
+    apiKey,
+    model: input.model,
+    systemPrompt: input.systemPrompt,
+    messages: input.messages,
+    maxOutputTokens: input.maxOutputTokens,
+  };
+
+  switch (input.provider) {
+    case "openai":
+      return openaiAdapter(request);
+    case "anthropic":
+      return anthropicAdapter(request);
+    case "google":
+      return geminiAdapter(request);
+    default: {
+      const _e: never = input.provider;
+      throw new Error(`Unsupported provider: ${_e}`);
+    }
+  }
+}
