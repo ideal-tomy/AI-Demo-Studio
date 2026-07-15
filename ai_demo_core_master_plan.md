@@ -5,7 +5,7 @@
 **対応ブランド:** AXEON / ideal / 他社・パートナーブランド  
 **対応AI Provider:** OpenAI / Anthropic Claude / Google Gemini  
 **最終更新:** 2026-07-16  
-**バージョン:** v1.6
+**バージョン:** v1.7
 
 ---
 
@@ -874,39 +874,26 @@ Output Adapter
 
 実際に複数ブランド・複数Provider・2〜3種類のデモで利用した結果をもとに、正式な共通基盤として固定する。
 
-### 候補名称
+### 判断項目（確定 — Decision 022）
 
-- `Universal AI Demo Core`
-- `AI Demo Kit`
-- private package名は実装時に決定
-
-### 想定構成
-
-```text
-@internal/ai-demo-core
-@internal/ai-demo-ui
-```
-
-または、必要性が確認できた場合のみモノレポ化する。
-
-### 判断項目
-
-- private npm packageにするか
-- Git subtree / shared packageにするか
-- monorepo化するか
-- Provider Adapterをどこまで正式対応するか
-- Managed Trial Gatewayを共通化するか
-- Phase 1.6の文書テキスト投入を標準Input Adapterへ昇格するか
-- 画像・音声・OCRを標準Input Adapterに含めるか
+- **共有形態:** `packages/ai-demo-core`（`@axeon/ai-demo-core`）+ 各デモ `file:` 依存
+- **private npm:** Phase 5 では未公開（将来同パッケージを publish 可能）
+- **monorepo:** しない（Studio / product_flow / dd_demo は別リポジトリ構成のまま）
+- **Provider:** OpenAI / Claude / Gemini 正式。Trial は OpenAI のみ
+- **Trial Gateway:** パッケージ共通。各デモは薄い `/api/trial/*`
+- **文書投入:** Phase 1.6 を標準 Input（`document-text-ingest`）としてパッケージに含む
+- **画像・音声・OCR:** 含めない（§6 拡張候補）
 
 ### 完了条件
 
-- 新規デモで共通基盤を短時間で導入できる
-- AI接続ロジックの重複実装がない
-- Brand / Demo / Provider Configで大半の差分を吸収できる
-- 既存デモの独自UIを維持できる
-- BYOK / Managed Trialを選択できる
-- 更新・保守方法が明確
+- [x] 新規デモで共通基盤を短時間で導入できる（`docs/porting-guide.md`）
+- [x] AI接続ロジックの重複実装がない（vendor コピー廃止）
+- [x] Brand / Demo / Provider Configで大半の差分を吸収できる
+- [x] 既存デモの独自UIを維持できる
+- [x] BYOK / Managed Trialを選択できる
+- [x] 更新・保守方法が明確（`sync-ai-demo-core-package.mjs` · `npm run build` in packages）
+
+詳細: `docs/PHASE5_HANDOFF.md`
 
 ---
 
@@ -962,7 +949,7 @@ Phase 1.6の全文コンテキスト投入を超える場合の候補。
 
 **Phase 3：ISOデモへ組み込み — 完了（product_flow）**  
 **Phase 3.5：Trial Portal 分離 — 完了（現行 Vercel 正 URL。DNS `demo.axeon.jp` は将来）**  
-**Phase 4：DDデモへ組み込み — 完了（実装。手動受け入れは handoff チェックリスト）**
+**Phase 5：正式共通基盤 — 完了（`@axeon/ai-demo-core` · vendor 廃止）**
 
 ## 認識の更新（2026-07-16）
 
@@ -985,29 +972,30 @@ Phase 1.6の全文コンテキスト投入を超える場合の候補。
 
 各デモは基本的に次だけで横展開する。
 
-1. `ExperienceModeBar` を置く
-2. 「体験コードを取得」→ `VITE_TRIAL_PORTAL_URL`（共通ポータル。必要なら `?demo=…&return=…`）
-3. 共通 API でコード検証する
+1. `@axeon/ai-demo-core` を `file:` 依存で追加 + `configureDemoCore`
+2. `ExperienceModeBar` を置く
+3. 「体験コードを取得」→ `VITE_TRIAL_PORTAL_URL`（共通ポータル。必要なら `?demo=…&return=…`）
+4. Input/Output Adapter + 薄い `/api/trial/*`
 
 ## 現在の作業
 
-- Phase 3.5 / Phase 4 実装完了
-- 手動受け入れ（BYOK / Trial / 回帰）は各 handoff のチェックリストで実施
-- product_flow: チャット型（ISO）
-- dd_demo `/ai`: フォーム型診断（`dd-diagnosis`）
-- Studio: `/admin/trial`（共通飛ばし先） · catalog
+- Phase 5 完了: `@axeon/ai-demo-core` パッケージ化、Studio / ISO / DD 移行
+- vendor コピー・`copy-vendor` スクリプト廃止
+- 3 プロジェクト `npm run build` 成功
 
 詳細:
 
+- `docs/PHASE5_HANDOFF.md`
+- `docs/porting-guide.md`
 - `product_flow/docs/PHASE3_FULL_HANDOFF.md`
 - `dd_demo/docs/PHASE4_HANDOFF.md`
 
 ## 次の作業
 
-1. Phase 3 / 4 手動受け入れ（必要範囲）
+1. 新規デモ横展開（porting-guide 手順）
 2. 将来: DNS `demo.axeon.jp` 差し替え（ポータル URL のみ更新）
-3. Phase 5: 正式パッケージ化判断
-4. 以降: OCR / 音声 / 写真 / 報告書など新規デモも **取得は共通ポータルのみ** で横展開
+3. 将来: private npm publish（必要時）
+4. §6 拡張（OCR / 音声 / 写真 / 報告書など）。取得は共通ポータルのみ
 
 ---
 
@@ -1036,7 +1024,7 @@ Phase 1.6の全文コンテキスト投入を超える場合の候補。
 - [x] Phase 3 ISOデモへ導入
 - [x] Phase 3.5 Trial Portal（共通飛ばし先 `/admin/trial` · 現行 Vercel 正 URL）
 - [x] Phase 4 DDデモへ導入（フォーム型 `/ai` · 既存演出併存）
-- [ ] Phase 5 正式パッケージ化判断
+- [x] Phase 5 正式パッケージ化（`@axeon/ai-demo-core` · `docs/PHASE5_HANDOFF.md`）
 
 ---
 
@@ -1088,7 +1076,7 @@ Phase 1.6の全文コンテキスト投入を超える場合の候補。
 
 **Provider一覧・モデル一覧を大量に見せない。**
 
-理由: 主役はモデル比較ではなく、自社情報で動く体験だから。
+理由: 主役はモデル比較ではなく、対象企業情報で動く体験だから。
 
 ## Decision 009
 
@@ -1212,6 +1200,17 @@ Studio は (1) 動くチャットデモ かつ (2) 全デモ共通の Trial / Ac
 - マスタープランの Diagnosis〜Roadmap スキーマを JSON 出力の正とする
 
 理由: チャット型（ISO）に続く第二の入力形態を最短で証明しつつ、既存営業デモ資産を維持するため。
+
+## Decision 022
+
+**Phase 5 は `@axeon/ai-demo-core` を Studio 内パッケージとして切り出し、各デモは `file:` 依存で参照する。**
+
+- vendor コピー連鎖（Studio → product_flow → dd_demo）は廃止
+- UI パッケージ（`@axeon/ai-demo-ui`）は作らない
+- `responseFormat` / `temperature` は Studio 正へ逆マージ。Trial Gateway は呼び出し側指定
+- ブラウザは `@axeon/ai-demo-core/demo-core` 等のサブパスを使う（ルート import はサーバー専用）
+
+理由: 重複排除・保守明確化を最短で達成し、将来 private npm へそのまま昇格できるため。
 
 ---
 

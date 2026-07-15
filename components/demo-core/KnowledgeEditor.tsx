@@ -26,7 +26,7 @@ export function KnowledgeEditor({
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         className="w-full rounded-md border border-[var(--brand-border)] px-3 py-2 text-sm leading-relaxed"
-        placeholder="ここに自社情報を貼り付け"
+        placeholder="ここに対象企業情報を貼り付け"
       />
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--brand-muted)]">
         <span>

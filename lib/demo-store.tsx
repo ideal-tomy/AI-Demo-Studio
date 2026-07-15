@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { demoConfig } from "@/config/demo.config";
+import { ensureAiDemoCoreConfigured } from "@/lib/ai-demo-core-setup";
 import { getProviderConfig } from "@/config/provider.config";
 import { trialPolicyConfig } from "@/config/trial-policy.config";
 import {
@@ -72,6 +73,7 @@ function uid(): string {
 }
 
 export function DemoProvider({ children }: { children: ReactNode }) {
+  ensureAiDemoCoreConfigured();
   const [hydrated, setHydrated] = useState(false);
   const [settings, setSettingsState] = useState<StudioSettings>(getSettings());
   const [apiKey, setApiKeyState] = useState("");

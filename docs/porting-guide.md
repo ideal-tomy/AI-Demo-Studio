@@ -1,98 +1,125 @@
-# 移植ガイド初版（Phase 2）
+# 移植ガイド（Phase 5 — `@axeon/ai-demo-core`）
 
-Universal AI Demo Studio から、別デモ（例: ISO）へ共通部分を持ち出すときの手順です。  
-npm パッケージ化前の「コピー／参照用」ガイドです。
+新規デモへ共通基盤を導入する手順です。vendor コピーは廃止し、**ローカルパッケージ**を参照します。
 
-## 1. 持ち出すもの
+## 1. 依存関係
 
-| 領域 | パス | タグ |
-|---|---|---|
-| Core | `lib/demo-core/`（`index.ts` から利用） | `CORE-CANDIDATE` |
-| Providers | `lib/providers/` | `PROVIDER-SPECIFIC` |
-| Trial Gateway | `lib/trial/` + `app/api/trial` / `app/api/admin/trial` | server only |
-| UI 候補 | `components/demo-core/` | `UI-CANDIDATE` |
-| Config | `config/*.ts` | BRAND / DEMO / PROVIDER |
-| Types | `types/` | — |
+各デモの `package.json`:
 
-デモ固有として残しがちなもの: `components/chat` / `studio` / `trial` / `brand` / `app` ページ構成。
+```json
+{
+  "dependencies": {
+    "@axeon/ai-demo-core": "file:../AI-Demo-Studio/packages/ai-demo-core"
+  },
+  "scripts": {
+    "build:core": "npm run build --prefix ../AI-Demo-Studio/packages/ai-demo-core",
+    "prebuild": "npm run build:core"
+  }
+}
+```
 
-## 2. Brand / Demo Config
+Studio 本体:
 
-1. `config/brand.config.ts` にブランドを追加し `NEXT_PUBLIC_BRAND_ID` で切替
-2. `config/demo.config.ts` でデモ名・Prompt・Role・質問例・ナレッジ上限を差し替え
-3. Core / UI に社名・デモ固有文言を直書きしない
+```json
+"@axeon/ai-demo-core": "file:./packages/ai-demo-core"
+```
 
-## 3. Access Mode
+Next.js は `transpilePackages: ["@axeon/ai-demo-core"]` を設定。
+
+## 2. 起動時設定（必須）
+
+ブラウザ側の storage / knowledge は `configureDemoCore()` が必要です。
+
+```ts
+import { configureDemoCore } from "@axeon/ai-demo-core/demo-core";
+import { demoConfig } from "./config/demo.config";
+
+configureDemoCore({
+  storageNamespace: "axeon", // または brandConfig.storageNamespace
+  demoId: demoConfig.id,
+  defaultRoleId: demoConfig.defaultRoleId,
+  knowledgePolicy: demoConfig.knowledgePolicy,
+  defaultAccessMode: demoConfig.defaultAccessMode,
+  defaultModel: demoConfig.defaultModel,
+  defaultProvider: demoConfig.defaultProvider,
+  // チャット型のみ
+  baseSystemPrompt: demoConfig.baseSystemPrompt,
+  demoSpecificPrompt: demoConfig.demoSpecificPrompt,
+  rolePresets: demoConfig.rolePresets,
+  chat: demoConfig.chat,
+});
+```
+
+`/ai` や診断ページのエントリで **1 回** 呼ぶ（例: `src/lib/ai-demo-core-setup.ts`）。
+
+## 3. インポート境界
+
+| 用途 | インポート先 |
+|------|----------------|
+| クライアント AI 通信 | `@axeon/ai-demo-core/demo-core` |
+| ストレージ | `@axeon/ai-demo-core/demo-core/storage` |
+| 型 | `@axeon/ai-demo-core/types/*` |
+| Provider 設定 | `@axeon/ai-demo-core/config/provider.config` |
+| Trial API（サーバー） | `@axeon/ai-demo-core/trial/gateway` · `trial/http` |
+| ルート `@axeon/ai-demo-core` | **サーバー専用**（crypto 含む。ブラウザから import しない） |
+
+## 4. デモ固有に残すもの
+
+- Brand / Demo Config（文言・Prompt・Role）
+- ExperienceModeBar / AccessModePanel
+- Input / Output Adapter（`iso-input` · `dd-input` 等）
+- 既存 UI（チャット・フォーム・演出）
+
+## 5. Access Mode
 
 ```ts
 accessMode: "byok-direct" | "managed-trial"
 ```
 
-- **BYOK:** ブラウザ → Provider Adapter（クライアントの APIキー）
-- **Managed Trial:** ブラウザ → `/api/trial/ask` → Gateway → **サーバーの OpenAI キーのみ**
+- **BYOK:** `sendAiRequest` → Provider Adapter
+- **Managed Trial:** `/api/trial/ask` → Gateway（OpenAI のみ）
 
-Trial の Allowlist は OpenAI のみ（`config/trial-policy.config.ts`）。
+体験コード取得は各デモに持たず、`VITE_TRIAL_PORTAL_URL` → Studio `/admin/trial`。
 
-必要な env（Trial）:
+## 6. 構造化 JSON（フォーム型）
 
-- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
-- `TRIAL_ADMIN_SECRET`
-- `OPENAI_API_KEY`（サーバー専用）
+`AiRequest` に `responseFormat` / `temperature` を指定。Trial 経路では `TrialAskRequestBody` にも同フィールドを渡す（Gateway は既定値を付けない）。
 
-発行 UI: `/admin/trial`（全デモ共通の飛ばし先もここ）
-
-## 4. Document Text Ingest（Phase 1.6）
+## 7. 新規デモ最短手順
 
 ```text
-ファイル選択
-→ extractDocumentText (Core, ブラウザ内)
-→ DocumentUploadField でプレビュー
-→ ユーザーが適用
-→ knowledge または customInstruction 文字列へ
-→ 既存 Prompt Builder / 文字数制限 / Trial Policy
+1. @axeon/ai-demo-core を file: 依存で追加
+2. configureDemoCore + Demo/Brand Config
+3. ExperienceModeBar + Access Mode 配線
+4. Input/Output Adapter
+5. VITE_TRIAL_PORTAL_URL → /admin/trial?demo=…&return=…
+6. 薄い api/trial/ask · status（gateway を呼ぶだけ）
+7. npm run build（prebuild で core を自動ビルド）
 ```
 
-- Knowledge: PDF(テキスト層) / TXT / MD / CSV / YAML / JSON
-- Prompt: TXT / MD / YAML / JSON / PDF(テキスト層)
-- サーバへ原ファイル・抽出本文は標準保存しない
-- OCR が必要な PDF は未対応としてユーザーへ案内
+## 8. Core 更新手順
 
-取り込み例:
-
-```tsx
-import { DocumentUploadField } from "@/components/demo-core/DocumentUploadField";
-import { KnowledgeEditor } from "@/components/demo-core/KnowledgeEditor";
+```text
+1. AI-Demo-Studio/packages/ai-demo-core を修正
+2. npm run build --prefix packages/ai-demo-core
+3. 各デモで npm install（必要時）→ npm run build
 ```
 
-## 5. 禁止事項
+Studio から同期する場合: `node scripts/sync-ai-demo-core-package.mjs` → `npm run build`（packages 内）。
 
-- UI から OpenAI / Anthropic / Gemini の `fetch` を直接呼ばない（`sendAiRequest` 経由）
-- 画面から `localStorage` / `sessionStorage` を直接触らない（`lib/demo-core/storage.ts`）
-- Trial Gateway にナレッジ／回答本文を永続化しない
-- Trial で Anthropic / Gemini を有効化しない（現状方針）
-- OCR・本格 RAG を「標準対応」と謳わない
+## 9. 参考実装
 
-## 6. 最小配線チェック
+| デモ | 型 | 参照 |
+|------|-----|------|
+| Studio | チャット | `lib/ai-demo-core-setup.ts` |
+| product_flow | チャット + RAG | `src/lib/ai-demo-core-setup.ts` |
+| dd_demo | フォーム + JSON | `src/lib/ai-demo-core-setup.ts` |
 
-- [ ] Brand Config だけで表示が変わる
-- [ ] Demo Config だけで Prompt / 質問例が変わる
-- [ ] BYOK で質問できる
-- [ ] Trial（OpenAI）で残回数が出る
-- [ ] 文書アップロード → プレビュー → 適用 → 質問
-- [ ] `npm run build` が通る
+詳細: `docs/PHASE5_HANDOFF.md`
 
-## 7. フォーム型デモ（Phase 4 参考：dd_demo）
+## 10. 禁止事項（従来どおり）
 
-チャット以外の証明として、`dd_demo` の `/ai` を参照する。
-
-| 項目 | 内容 |
-|------|------|
-| 既存 UI | Vanilla `/`（簿外債務演出）は維持 |
-| 新規 | React+TS `/ai`（企業フォーム → 構造化 JSON → 診断セクション） |
-| Input Adapter | `dd_demo/src/ai/adapters/dd-input.ts` |
-| Output Adapter | `dd_demo/src/ai/adapters/dd-output.ts` |
-| Vendor | `npm run copy-vendor`（product_flow vendor 経由） |
-| Trial 発行 | 持たない。`VITE_TRIAL_PORTAL_URL` → Studio `/admin/trial` |
-| catalog id | `dd-diagnosis` |
-
-詳細: `dd_demo/docs/PHASE4_HANDOFF.md`
+- UI から Provider `fetch` 直叩き
+- storage API 直触り
+- Trial へのナレッジ永続化
+- OCR / 本格 RAG を標準対応と謳う

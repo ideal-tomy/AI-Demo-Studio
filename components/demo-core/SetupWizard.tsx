@@ -87,7 +87,7 @@ export function SetupWizard() {
           セットアップ
         </h1>
         <p className="mt-2 text-[var(--brand-muted)]">
-          数分で、自社情報を参照するAI体験を始められます。
+          数分で、対象企業情報を参照するAI体験を始められます。
         </p>
       </div>
 

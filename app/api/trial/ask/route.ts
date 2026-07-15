@@ -36,6 +36,8 @@ export async function POST(req: Request) {
       })),
       knowledgeCharCount: Number(body.knowledgeCharCount) || 0,
       estimatedInputTokens: Number(body.estimatedInputTokens) || 0,
+      responseFormat: body.responseFormat,
+      temperature: body.temperature,
     });
 
     return NextResponse.json(result);
