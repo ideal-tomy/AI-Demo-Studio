@@ -25,6 +25,13 @@ export const DEMO_CATALOG: Record<string, DemoCatalogEntry> = {
       "共通プラットフォーム自体のチャット体験用です。サンプル・APIキー・体験コードの3モードを試せます。",
     labelPrefix: "Studio",
   },
+  "dd-diagnosis": {
+    id: "dd-diagnosis",
+    title: "DD診断デモ（フォーム型）",
+    blurb:
+      "体験コードを取得すると、企業フォーム入力から診断・ロードマップまでのAI構造化出力を規定回数まで試せます。",
+    labelPrefix: "DD",
+  },
   "ocr-document": {
     id: "ocr-document",
     title: "OCR帳票デモ",

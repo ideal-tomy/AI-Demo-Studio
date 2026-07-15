@@ -17,8 +17,8 @@ npm run dev
 ブラウザ: [http://localhost:3000](http://localhost:3000)
 
 - チャットデモ: `/`
-- **体験コード取得（お客様向け）: `/trial`**
-- Trial 管理（管理者）: `/admin/trial`
+- **体験コード取得（全デモ共通の飛ばし先）: `/admin/trial`**
+- `/trial` … 説明ページ（補助。デモからはリンクしない）
 
 ## 環境変数（Managed Trial）
 
@@ -47,21 +47,22 @@ NEXT_PUBLIC_BRAND_ID=ideal npm run dev
 
 ## Managed Trial
 
-APIキーを持たないクライアント向け。**公開での自己発行は停止**し、体験コードは営業・お問い合わせ経由で発行する。運営は `/admin/trial` で一覧・失効。  
+APIキーを持たないクライアント向け。**公開での自己発行は停止**し、体験コードは営業・お問い合わせ経由、または `/admin/trial` で発行する。  
+**各デモからの「体験コードを取得」リンクはすべて `/admin/trial` に統一。**  
 **Provider は OpenAI のみ**（Anthropic / Gemini は BYOK 用に残置）。
 
-`/trial` は説明・問い合わせ誘導ページ。発行そのものは `/admin/trial`。
+`/trial` は説明・問い合わせ誘導の補助ページ（任意）。
 
 ### お客様手順
 
-1. `/trial` またはお問い合わせ（[AXEONお問い合わせ](https://www.axeon.jp/contact)）で「体験コード希望」と連絡
-2. 営業から共有された平文コードを控える
+1. 各デモの「体験コードを取得」→ `/admin/trial`、またはお問い合わせ（[AXEONお問い合わせ](https://www.axeon.jp/contact)）で「体験コード希望」と連絡
+2. 共有された平文コードを控える
 3. デモ側の「体験コードで接続」に入力
 
 ### 運営手順
 
 1. Upstash と **`OPENAI_API_KEY`**、`TRIAL_ADMIN_SECRET` を設定
-2. `/admin/trial` でシークレット認証 → 一覧・失効・特権発行
+2. `/admin/trial` でシークレット認証 → 発行・一覧・失効
 3. 公開発行は既定で停止。再開するときだけ `TRIAL_PUBLIC_ISSUE=on`
 
 ### 営業文例

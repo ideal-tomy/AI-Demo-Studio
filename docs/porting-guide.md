@@ -39,7 +39,7 @@ Trial の Allowlist は OpenAI のみ（`config/trial-policy.config.ts`）。
 - `TRIAL_ADMIN_SECRET`
 - `OPENAI_API_KEY`（サーバー専用）
 
-発行 UI: `/admin/trial`
+発行 UI: `/admin/trial`（全デモ共通の飛ばし先もここ）
 
 ## 4. Document Text Ingest（Phase 1.6）
 
@@ -80,3 +80,19 @@ import { KnowledgeEditor } from "@/components/demo-core/KnowledgeEditor";
 - [ ] Trial（OpenAI）で残回数が出る
 - [ ] 文書アップロード → プレビュー → 適用 → 質問
 - [ ] `npm run build` が通る
+
+## 7. フォーム型デモ（Phase 4 参考：dd_demo）
+
+チャット以外の証明として、`dd_demo` の `/ai` を参照する。
+
+| 項目 | 内容 |
+|------|------|
+| 既存 UI | Vanilla `/`（簿外債務演出）は維持 |
+| 新規 | React+TS `/ai`（企業フォーム → 構造化 JSON → 診断セクション） |
+| Input Adapter | `dd_demo/src/ai/adapters/dd-input.ts` |
+| Output Adapter | `dd_demo/src/ai/adapters/dd-output.ts` |
+| Vendor | `npm run copy-vendor`（product_flow vendor 経由） |
+| Trial 発行 | 持たない。`VITE_TRIAL_PORTAL_URL` → Studio `/admin/trial` |
+| catalog id | `dd-diagnosis` |
+
+詳細: `dd_demo/docs/PHASE4_HANDOFF.md`
