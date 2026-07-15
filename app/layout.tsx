@@ -1,9 +1,12 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { brandConfig } from "@/config/brand.config";
+import { ensureAiDemoCoreConfigured } from "@/lib/ai-demo-core-setup";
 import { DemoProvider } from "@/lib/demo-store";
 import { AppShell } from "@/components/brand/AppShell";
 import "./globals.css";
+
+ensureAiDemoCoreConfigured();
 
 export const metadata: Metadata = {
   title: `${brandConfig.productName} | ${brandConfig.companyName}`,

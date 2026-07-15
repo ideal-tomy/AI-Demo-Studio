@@ -9,22 +9,18 @@
 ```json
 {
   "dependencies": {
-    "@axeon/ai-demo-core": "file:../AI-Demo-Studio/packages/ai-demo-core"
+    "@axeon/ai-demo-core": "file:./packages/ai-demo-core"
   },
   "scripts": {
-    "build:core": "npm run build --prefix ../AI-Demo-Studio/packages/ai-demo-core",
+    "vendor-core": "node scripts/vendor-ai-demo-core.mjs",
+    "build:core": "node scripts/build-core.mjs",
     "prebuild": "npm run build:core"
   }
 }
 ```
 
-Studio 本体:
+**Vercel 注意:** デモリポジトリ単体デプロイのため、ビルド済み Core を `packages/ai-demo-core`（`dist` 含む）としてデモ側にベンダーする。Studio 隣の `file:../AI-Demo-Studio/...` はローカル同期用のみ。Core 更新後はワークスペースで `npm run vendor-core` を実行し、デモへコミットする。
 
-```json
-"@axeon/ai-demo-core": "file:./packages/ai-demo-core"
-```
-
-Next.js は `transpilePackages: ["@axeon/ai-demo-core"]` を設定。
 
 ## 2. 起動時設定（必須）
 

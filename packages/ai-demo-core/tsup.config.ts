@@ -32,7 +32,7 @@ export default defineConfig({
   ],
   format: ["esm"],
   dts: true,
-  splitting: false,
+  splitting: true,
   clean: true,
   sourcemap: true,
   outDir: "dist",

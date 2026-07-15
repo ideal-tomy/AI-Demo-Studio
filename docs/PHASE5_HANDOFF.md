@@ -28,6 +28,19 @@ Phase 5 では vendor コピー連鎖を廃止し、Studio 正の **`@axeon/ai-d
 - `dd_demo/scripts/copy-vendor-phase4.mjs`（削除）
 - `dd_demo` の `npm run copy-vendor`
 
+## Vercel / 単体デプロイ
+
+`product_flow` / `dd_demo` は `file:./packages/ai-demo-core`（ビルド済み `dist` をコミット）を参照する。  
+`prebuild` は Studio 隣接時のみ Core 再ビルド＋ベンダーし、Vercel 上ではベンダー済みパッケージを使う。
+
+Core 更新後のローカル手順:
+
+```bash
+cd product_flow   # or dd_demo
+npm run vendor-core
+# packages/ai-demo-core をコミットしてデプロイ
+```
+
 ## ビルド
 
 各プロジェクトで `npm run build` 成功（`prebuild` が core を tsup ビルド）。

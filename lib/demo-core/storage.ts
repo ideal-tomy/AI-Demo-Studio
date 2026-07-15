@@ -1,1 +1,1 @@
-export * from "@axeon/ai-demo-core/demo-core/storage";
+export * from "@axeon/ai-demo-core/demo-core";
