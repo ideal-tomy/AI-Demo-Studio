@@ -16,8 +16,9 @@ npm run dev
 
 ブラウザ: [http://localhost:3000](http://localhost:3000)
 
-- Spike: `/spike`
-- Trial 管理: `/admin/trial`
+- チャットデモ: `/`
+- **体験コード取得（お客様向け）: `/trial`**
+- Trial 管理（管理者）: `/admin/trial`
 
 ## 環境変数（Managed Trial）
 
@@ -25,6 +26,7 @@ npm run dev
 |---|---|
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Trial Ledger / lock / rate limit |
 | `TRIAL_ADMIN_SECRET` | `/admin/trial` 認証 |
+| `TRIAL_PUBLIC_ISSUE` | `off` で公開 `/trial` の自己発行を停止（既定は有効） |
 | `OPENAI_API_KEY` | **サーバー専用**（Managed Trial は OpenAI のみ） |
 | `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY` | BYOK 用（Trial では未使用） |
 | `TRIAL_DEFAULT_MODEL` | Trial 既定モデル（OpenAI Allowlist 内） |
@@ -45,21 +47,28 @@ NEXT_PUBLIC_BRAND_ID=ideal npm run dev
 
 ## Managed Trial
 
-APIキーを持たないクライアント向け。運営が体験コードを発行します。  
+APIキーを持たないクライアント向け。**お客様は `/trial` で自己取得**、運営は `/admin/trial` で一覧・失効。  
 **Provider は OpenAI のみ**（Anthropic / Gemini は BYOK 用に残置）。
+
+デモ量産時は各デモから:
+
+```text
+https://demo.axeon.jp/trial?demo=<demo-id>&return=<デモのURL>
+```
+
+へ誘導する（`config/demo-catalog.config.ts` にエントリを追加）。
+
+### お客様手順
+
+1. `/trial`（または各デモの「体験コードを取得」）でコード発行
+2. 平文コードを控える（この画面でのみ表示）
+3. デモ側の「体験コードで試す」に入力
 
 ### 運営手順
 
 1. Upstash と **`OPENAI_API_KEY`**、`TRIAL_ADMIN_SECRET` を設定
-2. `/admin/trial` でシークレット認証 → 発行（ラベルに社名など）
-3. **平文コードは発行時のみ表示** — クライアントへ安全に共有
-4. 不要になったら管理画面から即時失効
-
-### クライアント手順
-
-1. セットアップ →「体験コードで接続」（OpenAI 固定）
-2. コード入力 → 接続確認（課金なし・status のみ）
-3. ナレッジ投入（テキスト貼り付け、またはファイルから読み込み）→ 質問（UI 主表示: **残り N / 10 回**）
+2. `/admin/trial` でシークレット認証 → 一覧・失効・特権発行
+3. 公開発行を止めたいときは `TRIAL_PUBLIC_ISSUE=off`
 
 ### 営業文例
 

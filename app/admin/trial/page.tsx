@@ -111,7 +111,11 @@ export default function AdminTrialPage() {
       <div>
         <h1 className="text-2xl font-semibold">Managed Trial 管理</h1>
         <p className="mt-1 text-sm text-[var(--brand-muted)]">
-          体験コードの発行・一覧・即時失効。Provider APIキーはここには表示されません。
+          管理者専用：発行・一覧・失効。お客様向け取得は{" "}
+          <a href="/trial" className="underline">
+            /trial
+          </a>
+          を使ってください。
         </p>
       </div>
 

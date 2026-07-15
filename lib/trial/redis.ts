@@ -37,4 +37,7 @@ export const trialKeys = {
   rpm: (hash: string, minuteKey: string) => `trial:rpm:${hash}:${minuteKey}`,
   lock: (hash: string) => `trial:lock:${hash}`,
   index: () => `trial:index`,
+  /** Public /trial issue rate limit (per IP, per hour) */
+  issueHour: (ipHash: string, hourKey: string) =>
+    `trial:issue:${ipHash}:${hourKey}`,
 };

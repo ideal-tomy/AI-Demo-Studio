@@ -39,7 +39,8 @@ export type TrialRejectCode =
   | "KNOWLEDGE_LIMIT"
   | "INPUT_TOKEN_LIMIT"
   | "CONFIG"
-  | "UNAUTHORIZED";
+  | "UNAUTHORIZED"
+  | "FORBIDDEN";
 
 export function validateTrialState(
   record: TrialRecord | null,
