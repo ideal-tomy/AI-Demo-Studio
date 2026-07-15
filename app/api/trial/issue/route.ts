@@ -12,8 +12,9 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 /**
- * Public trial issuance for /trial portal (no admin secret).
- * Rate-limited per IP. Disable with TRIAL_PUBLIC_ISSUE=off.
+ * Public trial issuance for /trial portal.
+ * Disabled by default — enable with TRIAL_PUBLIC_ISSUE=on.
+ * Rate-limited per IP when enabled.
  */
 export async function POST(req: Request) {
   try {

@@ -38,10 +38,14 @@ export async function checkPublicIssueRateLimit(
   return { ok: true };
 }
 
+/**
+ * Public self-serve issuance is OFF by default (cost / abuse control).
+ * Enable only with TRIAL_PUBLIC_ISSUE=on when intentionally opening the portal.
+ */
 export function isPublicIssueEnabled(): boolean {
   const flag = process.env.TRIAL_PUBLIC_ISSUE?.trim().toLowerCase();
-  if (flag === "off" || flag === "0" || flag === "false") return false;
-  return true;
+  if (flag === "on" || flag === "1" || flag === "true") return true;
+  return false;
 }
 
 export function clientIpFromRequest(req: Request): string {

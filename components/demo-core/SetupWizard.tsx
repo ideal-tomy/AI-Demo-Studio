@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { demoConfig } from "@/config/demo.config";
 import { getProviderConfig } from "@/config/provider.config";
@@ -203,6 +204,18 @@ export function SetupWizard() {
                   value={trialCode}
                   onChange={setTrialCodeValue}
                 />
+                <p className="text-sm">
+                  <Link
+                    href="/trial"
+                    className="font-medium text-[var(--brand-accent)] underline underline-offset-2"
+                  >
+                    体験コード取得
+                  </Link>
+                  <span className="text-xs text-[var(--brand-muted)]">
+                    {" "}
+                    — コードをお持ちでない方はお問い合わせください
+                  </span>
+                </p>
                 <p className="text-xs text-[var(--brand-muted)]">
                   体験は回数・期間・金額上限でサーバ側に制限されます。Provider
                   は OpenAI 固定です。

@@ -6,11 +6,11 @@ export const axeonBrand: BrandConfig = {
   companyName: "AXEON",
   productName: "AI Demo Studio",
   logoText: "AXEON",
-  contactUrl: "https://example.com/axeon/contact",
-  legalUrl: "https://example.com/axeon/legal",
+  contactUrl: "https://www.axeon.jp/contact",
+  legalUrl: "https://www.axeon.jp/contact",
   storageNamespace: "axeon",
   ctaLabel: "AXEONに相談する",
-  ctaUrl: "https://example.com/axeon/contact",
+  ctaUrl: "https://www.axeon.jp/contact",
   legalNotice:
     "本デモは検証用の体験環境です。APIキーや機密情報の取り扱いにはご注意ください。",
   theme: {
