@@ -204,18 +204,17 @@ export function SetupWizard() {
                   value={trialCode}
                   onChange={setTrialCodeValue}
                 />
-                <p className="text-sm">
+                <div className="flex flex-wrap items-center gap-3">
                   <Link
-                    href="/trial"
-                    className="font-medium text-[var(--brand-accent)] underline underline-offset-2"
+                    href="/admin/trial"
+                    className="inline-flex rounded-md border border-[var(--brand-accent)] bg-[var(--brand-accent-soft)] px-4 py-2 text-sm font-medium text-[var(--brand-accent)]"
                   >
                     体験コード取得
                   </Link>
                   <span className="text-xs text-[var(--brand-muted)]">
-                    {" "}
-                    — コードをお持ちでない方はお問い合わせください
+                    コードをお持ちでない方はこちら（お問い合わせ／運営者）
                   </span>
-                </p>
+                </div>
                 <p className="text-xs text-[var(--brand-muted)]">
                   体験は回数・期間・金額上限でサーバ側に制限されます。Provider
                   は OpenAI 固定です。

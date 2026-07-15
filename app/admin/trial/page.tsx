@@ -159,11 +159,15 @@ export default function AdminTrialPage() {
         </h2>
         {!unlocked ? (
           <p className="text-xs text-[var(--brand-muted)]">
-            発行・一覧・失効を行う場合は、アクセスキーを入力してください。
+            発行・一覧・失効を行う場合は、サーバー環境変数{" "}
+            <code className="rounded bg-[var(--brand-accent-soft)] px-1">
+              TRIAL_ADMIN_SECRET
+            </code>{" "}
+            に設定した値を入力してください。
           </p>
         ) : null}
         <label className="block text-sm">
-          <span className="font-medium">アクセスキー</span>
+          <span className="font-medium">アクセスキー（TRIAL_ADMIN_SECRET）</span>
           <input
             type="password"
             autoComplete="off"
@@ -173,7 +177,7 @@ export default function AdminTrialPage() {
               setSecret(e.target.value);
               setUnlocked(false);
             }}
-            placeholder="アクセスキーを入力"
+            placeholder="環境変数に設定したシークレットの値"
           />
         </label>
         <div className="flex flex-wrap gap-2">
