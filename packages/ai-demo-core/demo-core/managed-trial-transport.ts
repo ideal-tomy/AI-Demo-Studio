@@ -13,6 +13,13 @@ export type ManagedTrialRequest = {
   estimatedInputTokens: number;
   responseFormat?: { type: "json_object" };
   temperature?: number;
+  reasoningEffort?:
+    | "none"
+    | "minimal"
+    | "low"
+    | "medium"
+    | "high"
+    | "xhigh";
 };
 
 export async function fetchTrialStatus(
@@ -56,6 +63,7 @@ export async function managedTrialTransport(
       estimatedInputTokens: request.estimatedInputTokens,
       responseFormat: request.responseFormat,
       temperature: request.temperature,
+      reasoningEffort: request.reasoningEffort,
     }),
   });
 

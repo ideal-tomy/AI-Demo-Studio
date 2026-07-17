@@ -194,6 +194,7 @@ export async function executeTrialAsk(
         maxOutputTokens: maxOut,
         responseFormat: body.responseFormat,
         temperature: body.temperature,
+        reasoningEffort: body.reasoningEffort,
       });
     } catch (providerError) {
       const norm = normalizeError(provider, providerError);

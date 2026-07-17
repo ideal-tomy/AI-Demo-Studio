@@ -30,6 +30,7 @@ export async function runServerProviderRequest(input: {
   maxOutputTokens: number;
   responseFormat?: { type: "json_object" };
   temperature?: number;
+  reasoningEffort?: AiRequest["reasoningEffort"];
 }): Promise<AiResult> {
   const apiKey = getServerApiKey(input.provider);
   const request: AiRequest = {
@@ -42,6 +43,7 @@ export async function runServerProviderRequest(input: {
     maxOutputTokens: input.maxOutputTokens,
     responseFormat: input.responseFormat,
     temperature: input.temperature,
+    reasoningEffort: input.reasoningEffort,
   };
 
   switch (input.provider) {

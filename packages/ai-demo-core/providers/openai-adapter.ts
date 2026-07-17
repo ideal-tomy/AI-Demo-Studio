@@ -27,6 +27,9 @@ export async function openaiAdapter(request: AiRequest): Promise<AiResult> {
   if (request.temperature !== undefined) {
     body.temperature = request.temperature;
   }
+  if (request.reasoningEffort !== undefined) {
+    body.reasoning_effort = request.reasoningEffort;
+  }
 
   const res = await fetch(OPENAI_URL, {
     method: "POST",

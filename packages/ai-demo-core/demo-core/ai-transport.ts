@@ -61,6 +61,7 @@ export async function sendAiRequest(
         estimatedInputTokens: extra.estimatedInputTokens ?? 0,
         responseFormat: request.responseFormat,
         temperature: request.temperature,
+        reasoningEffort: request.reasoningEffort,
       });
       return {
     text: result.text,

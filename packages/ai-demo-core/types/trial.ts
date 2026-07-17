@@ -79,6 +79,7 @@ export type TrialAskRequestBody = {
   estimatedInputTokens: number;
   responseFormat?: { type: "json_object" };
   temperature?: number;
+  reasoningEffort?: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
 };
 
 export type TrialAskResponse = {
